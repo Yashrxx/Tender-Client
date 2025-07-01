@@ -53,7 +53,7 @@ const Profile = () => {
         return setLoading(false);
       }
 
-      const res = await fetch(`http://localhost:5000/api/companyRoutes/companyProfile?email=${user.email}`, {
+      const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile?email=${user.email}`, {
         headers: {
           'auth-token': token
         }
@@ -80,8 +80,8 @@ const Profile = () => {
         });
 
         setPreview({
-          logo: data.logo || 'http://localhost:5000/uploads/1751308596115-TAT_Logo.jpeg',
-          coverImage: data.coverImage || 'http://localhost:5000/uploads/1751308596116-wood-blk-bg.jpg'
+          logo: data.logo || 'https://tender-client.onrender.com//uploads/1751308596115-TAT_Logo.jpeg',
+          coverImage: data.coverImage || 'https://tender-client.onrender.com//uploads/1751308596116-wood-blk-bg.jpg'
         });
       } else {
         console.warn("Company profile not found or error — using fallback values");
@@ -99,8 +99,8 @@ const Profile = () => {
         });
 
         setPreview({
-          logo: 'http://localhost:5000/uploads/1751308596115-TAT_Logo.jpeg',
-          coverImage: 'http://localhost:5000/uploads/1751308596116-wood-blk-bg.jpg'
+          logo: 'https://tender-client.onrender.com//uploads/1751308596115-TAT_Logo.jpeg',
+          coverImage: 'https://tender-client.onrender.com//uploads/1751308596116-wood-blk-bg.jpg'
         });
       }
     } catch (err) {
@@ -173,7 +173,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/companyRoutes/companyProfile', {
+      const res = await fetch('https://tender-client.onrender.com//api/companyRoutes/companyProfile', {
         method: 'POST',
         headers: {
           'auth-token': token

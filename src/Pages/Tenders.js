@@ -13,7 +13,7 @@ const Tenders = () => {
     const fetchTenders = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/tenderRoutes/newTender', {
+        const res = await fetch('https://tender-client.onrender.com/api/tenderRoutes/newTender', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
