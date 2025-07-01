@@ -1,9 +1,8 @@
-import './Profile.css';
+import './Profile.css'; 
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 
 const Profile = () => {
-
   const companyCategories = [
     "Construction & Civil Works",
     "Information Technology (IT)",
@@ -42,7 +41,6 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch profile
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -54,16 +52,14 @@ const Profile = () => {
       }
 
       const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile?email=${user.email}`, {
-        headers: {
-          'auth-token': token
-        }
+        headers: { 'auth-token': token }
       });
 
       let data = null;
       try {
         data = await res.json();
-      } catch (parseError) {
-        console.warn("Failed to parse JSON response, using fallback.");
+      } catch {
+        console.warn("Failed to parse JSON response");
       }
 
       if (res.ok && data) {
@@ -80,11 +76,11 @@ const Profile = () => {
         });
 
         setPreview({
-          logo: data.logo || 'https://tender-client.onrender.com//uploads/1751308596115-TAT_Logo.jpeg',
-          coverImage: data.coverImage || 'https://tender-client.onrender.com//uploads/1751308596116-wood-blk-bg.jpg'
+          logo: data.logo || 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
+          coverImage: data.coverImage || 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
         });
       } else {
-        console.warn("Company profile not found or error — using fallback values");
+        console.warn("Company profile not found — using fallback");
 
         setFormData({
           name: '',
@@ -99,14 +95,14 @@ const Profile = () => {
         });
 
         setPreview({
-          logo: 'https://tender-client.onrender.com//uploads/1751308596115-TAT_Logo.jpeg',
-          coverImage: 'https://tender-client.onrender.com//uploads/1751308596116-wood-blk-bg.jpg'
+          logo: 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
+          coverImage: 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
         });
       }
     } catch (err) {
-      console.error("Fetch failed completely:", err);
-      // fallback if request fails entirely
+      console.error("Fetch failed:", err);
       const user = JSON.parse(localStorage.getItem('user'));
+
       setFormData({
         name: 'yash',
         website: 'https://yashrx@gmail.com',
@@ -120,8 +116,8 @@ const Profile = () => {
       });
 
       setPreview({
-        logo: 'http://localhost:5000/uploads/1751308596115-TAT_Logo.jpeg',
-        coverImage: 'http://localhost:5000/uploads/1751308596116-wood-blk-bg.jpg'
+        logo: 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
+        coverImage: 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
       });
     } finally {
       setLoading(false);
@@ -132,12 +128,10 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  // Handle text changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle file input
   const [logoFile, setLogoFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
 
@@ -159,8 +153,6 @@ const Profile = () => {
     }
   };
 
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -173,7 +165,7 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://tender-client.onrender.com//api/companyRoutes/companyProfile', {
+      const res = await fetch('https://tender-client.onrender.com/api/companyRoutes/companyProfile', {
         method: 'POST',
         headers: {
           'auth-token': token
@@ -209,26 +201,23 @@ const Profile = () => {
         <label>Company Website</label>
         <input type="text" name="website" value={formData.website} onChange={handleChange} placeholder="Enter website URL" disabled={!isEditing} />
 
-        {/* <label>Industry</label>
-        <input type="text" name="industry" value={formData.industry} onChange={handleChange} placeholder="Enter industry" disabled={!isEditing} /> */}
-
-
         <label htmlFor="category">Industry</label>
-                <Select disabled={!isEditing}
-                  options={companyCategories.map(cat => ({ value: cat, label: cat }))}
-                  value={formData.industry ? { value: formData.industry, label: formData.industry } : null}
-                  onChange={(selectedOption) =>
-                    setFormData({ ...formData, industry: selectedOption.value })
-                  }
-                  placeholder="Select industry"
-                  styles={{
-                    menuList: (base) => ({
-                      ...base,
-                      maxHeight: 150,
-                      overflowY: 'auto',
-                    }),
-                  }}
-                />
+        <Select
+          disabled={!isEditing}
+          options={companyCategories.map(cat => ({ value: cat, label: cat }))}
+          value={formData.industry ? { value: formData.industry, label: formData.industry } : null}
+          onChange={(selectedOption) =>
+            setFormData({ ...formData, industry: selectedOption.value })
+          }
+          placeholder="Select industry"
+          styles={{
+            menuList: (base) => ({
+              ...base,
+              maxHeight: 150,
+              overflowY: 'auto',
+            }),
+          }}
+        />
 
         <label>Company Description</label>
         <textarea rows="4" name="description" value={formData.description} onChange={handleChange} placeholder="Enter description" disabled={!isEditing}></textarea>
@@ -244,39 +233,25 @@ const Profile = () => {
 
         <div className="upload-section">
           <label>Logo</label>
-          <input
-            type="file"
-            name="logo"
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={!isEditing}
-          />
+          <input type="file" name="logo" accept="image/*" onChange={handleFileChange} disabled={!isEditing} />
           {logoFile && <p className="filename">{logoFile.name}</p>}
           {preview.logo && <img src={preview.logo} alt="Logo Preview" width="100" />}
         </div>
 
         <div className="upload-section">
           <label>Cover Image</label>
-          <input
-            type="file"
-            name="coverImage"
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={!isEditing}
-          />
+          <input type="file" name="coverImage" accept="image/*" onChange={handleFileChange} disabled={!isEditing} />
           {coverFile && <p className="filename">{coverFile.name}</p>}
           {preview.coverImage && <img src={preview.coverImage} alt="Cover Preview" width="200" />}
         </div>
 
-        {isEditing && (
+        {isEditing ? (
           <div className="button-wrapper">
             <button type="submit" className="save-button">Save Changes</button>
           </div>
-        )}
-
-        {!isEditing && (
+        ) : (
           <div className="button-wrapper">
-            <button onClick={() => setIsEditing(true)} className="edit-button">Edit</button>
+            <button type="button" onClick={() => setIsEditing(true)} className="edit-button">Edit</button>
           </div>
         )}
       </form>
