@@ -44,7 +44,7 @@ function App() {
     return () => window.removeEventListener("storage", checkAuth);
   }, [setIsAuthenticated]);
   return (
-    <Router>
+    <Router basename='/Tender-Client'>
       <Navbar btnText={btnText} mode={mode} toggleMode={toggleMode} username={username}/>
       <Routes>
         <Route path="/" element={<Login mode={mode}/>} />
