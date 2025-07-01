@@ -1,12 +1,11 @@
-// middleware/fetchCompany.js
 const Company = require('../models/CompanySchema');
 
 const fetchCompany = async (req, res, next) => {
   try {
-    const email = req.query.email || req.body.email;
+    const email = req.user?.email; // ✅ comes from token via fetchUser
 
     if (!email) {
-      return res.status(400).json({ error: "Email is required to fetch company" });
+      return res.status(400).json({ error: "Authenticated email not found" });
     }
 
     const company = await Company.findOne({ email });
