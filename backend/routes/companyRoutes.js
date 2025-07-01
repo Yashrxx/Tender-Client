@@ -6,7 +6,7 @@ const Company = require('../models/CompanySchema');
 const fetchCompany = require('../middleware/fetchCompany');
 const router = express.Router();
 
-router.post('/companyProfile', upload.fields([
+router.post('/companyProfile', fetchCompany, upload.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'coverImage', maxCount: 1 }
 ]), async (req, res) => {
@@ -17,9 +17,10 @@ router.post('/companyProfile', upload.fields([
       industry,
       description,
       address,
-      email,
       phone
     } = req.body;
+
+    const email = req.user.email; // ✅ Now coming from token, not from form
 
     if (!name || !email) {
       return res.status(400).json({ error: "Name and email are required." });
@@ -35,7 +36,7 @@ router.post('/companyProfile', upload.fields([
       ? `${baseUrl}/uploads/${path.basename(req.files.coverImage[0].path)}`
       : null;
 
-    const existing = await Company.findOne({ email });
+    const existing = await Company.findOne({ email }); // ✅ or use req.user.id if you store companyId in token
 
     const companyData = {
       name,
@@ -43,14 +44,13 @@ router.post('/companyProfile', upload.fields([
       industry,
       description,
       address,
-      email,
+      email,  // still store it for DB consistency
       phone,
       ...(logo && { logo }),
       ...(coverImage && { coverImage })
     };
 
     if (existing) {
-      // Delete old files if new ones uploaded
       if (logo && existing.logo) {
         const oldLogoPath = path.join(__dirname, '..', 'uploads', path.basename(existing.logo));
         fs.existsSync(oldLogoPath) && fs.unlinkSync(oldLogoPath);
