@@ -11,7 +11,20 @@ router.post('/companyProfile', upload.fields([
   { name: 'coverImage', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    const data = req.body;
+    const {
+      name,
+      website,
+      industry,
+      description,
+      address,
+      email,
+      phone
+    } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({ error: "Name and email are required." });
+    }
+
     const baseUrl = `${req.protocol}://${req.get('host')}`;
 
     const logo = req.files?.logo?.[0]
@@ -22,35 +35,36 @@ router.post('/companyProfile', upload.fields([
       ? `${baseUrl}/uploads/${path.basename(req.files.coverImage[0].path)}`
       : null;
 
-    const existing = await Company.findOne({ email: data.email });
+    const existing = await Company.findOne({ email });
+
+    const companyData = {
+      name,
+      website,
+      industry,
+      description,
+      address,
+      email,
+      phone,
+      ...(logo && { logo }),
+      ...(coverImage && { coverImage })
+    };
 
     if (existing) {
-      // Delete old logo if new one uploaded
+      // Delete old files if new ones uploaded
       if (logo && existing.logo) {
         const oldLogoPath = path.join(__dirname, '..', 'uploads', path.basename(existing.logo));
         fs.existsSync(oldLogoPath) && fs.unlinkSync(oldLogoPath);
       }
-
-      // Delete old cover image if new one uploaded
       if (coverImage && existing.coverImage) {
         const oldCoverPath = path.join(__dirname, '..', 'uploads', path.basename(existing.coverImage));
         fs.existsSync(oldCoverPath) && fs.unlinkSync(oldCoverPath);
       }
 
-      const updatedCompany = await Company.findByIdAndUpdate(
-        existing._id,
-        {
-          ...data,
-          ...(logo && { logo }),
-          ...(coverImage && { coverImage })
-        },
-        { new: true }
-      );
-
+      const updatedCompany = await Company.findByIdAndUpdate(existing._id, companyData, { new: true });
       return res.status(200).json({ message: "Company profile updated", company: updatedCompany });
     }
 
-    const newCompany = new Company({ ...data, logo, coverImage });
+    const newCompany = new Company(companyData);
     await newCompany.save();
 
     res.status(201).json({ message: "Company profile created", company: newCompany });

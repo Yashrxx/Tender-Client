@@ -63,6 +63,8 @@ const Profile = () => {
       }
 
       if (res.ok && data) {
+        console.log(data)
+        console.log(data.name)
         setFormData({
           name: data.name || '',
           website: data.website || '',
