@@ -1,13 +1,24 @@
 const connectToMongo = require("./db");
 connectToMongo();
+
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+
+// ✅ Create uploads folder if it doesn't exist
+const uploadPath = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath);
+  console.log("'uploads/' folder created.");
+}
+
 const tenderRoutes = require('./routes/tenderRoutes');
 const authRoutes = require('./routes/auth');
 const companyRoutes = require('./routes/companyRoutes');
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 const allowedOrigins = [
   "http://localhost:3001",
