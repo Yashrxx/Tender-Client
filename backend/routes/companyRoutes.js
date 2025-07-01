@@ -4,6 +4,7 @@ const path = require('path');
 const upload = require('../middleware/upLoad');
 const Company = require('../models/CompanySchema');
 const fetchCompany = require('../middleware/fetchCompany');
+const fetchUser = require('../middleware/fetchUser')
 const router = express.Router();
 
 router.post('/companyProfile',
