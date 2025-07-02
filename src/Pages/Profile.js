@@ -158,30 +158,30 @@ const Profile = () => {
       const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile/${isEditing ? 'update' : 'create'}`, {
         method: isEditing ? 'PUT' : 'POST',
         headers: {
-          'auth-token': token
+          'auth-token': token,
+          'email': formData.email
         },
         body: submitData
       });
 
       const result = await res.json();
+
       if (res.ok) {
         alert('Profile saved successfully');
-
         if (result?.message === "Company profile updated") {
           setIsEditing(false);
         } else {
           setIsEditing(true);
         }
-
         fetchProfile();
       } else {
         alert(result.error || 'Something went wrong');
       }
-
-    } catch {
+    } catch (err) {
       alert('Failed to submit profile');
     }
   };
+
 
   if (loading) return <p>Loading profile...</p>;
 
