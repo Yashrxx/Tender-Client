@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import './CompanyDetails.css';
+import './companyDetails.css';
 
 const CompanyDetails = () => {
   const { state } = useLocation();

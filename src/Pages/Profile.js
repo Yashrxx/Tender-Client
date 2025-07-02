@@ -57,7 +57,7 @@ const Profile = () => {
       let data = null;
       try {
         data = await res.json();
-      } catch {}
+      } catch { }
 
       if (res.ok && data) {
         setFormData({
@@ -307,22 +307,23 @@ const Profile = () => {
           {preview.coverImage && <img src={preview.coverImage} alt="Cover Preview" width="200" />}
         </div>
 
-        <div className="button-wrapper">
-          {(!profileExists || isEditing) ? (
-            <button type="submit" className="save-button">
-              {profileExists ? 'Save Changes' : 'Create Profile'}
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className="edit-button"
-            >
-              Edit
-            </button>
-          )}
-        </div>
       </form>
+
+      <div className="button-wrapper">
+        {(!profileExists || isEditing) ? (
+          <button type="submit" className="save-button" onClick={handleSubmit}>
+            {profileExists ? 'Save Changes' : 'Create Profile'}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="edit-button"
+          >
+            Edit
+          </button>
+        )}
+      </div>
     </div>
   );
 };
