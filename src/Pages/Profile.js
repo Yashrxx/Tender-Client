@@ -198,12 +198,32 @@ const Profile = () => {
       <h1>Company Profile</h1>
       <p className="subtext">Manage your company's information and settings.</p>
 
-      <form className="form" onSubmit={handleSubmit}>
+      <form
+        className="form"
+        onSubmit={handleSubmit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.preventDefault();
+        }}
+      >
         <label>Company Name</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Enter company name" disabled={profileExists && !isEditing} />
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Enter company name"
+          disabled={profileExists && !isEditing}
+        />
 
         <label>Company Website</label>
-        <input type="text" name="website" value={formData.website} onChange={handleChange} placeholder="Enter website URL" disabled={profileExists && !isEditing} />
+        <input
+          type="text"
+          name="website"
+          value={formData.website}
+          onChange={handleChange}
+          placeholder="Enter website URL"
+          disabled={profileExists && !isEditing}
+        />
 
         <label htmlFor="category">Industry</label>
         <Select
@@ -222,27 +242,67 @@ const Profile = () => {
         />
 
         <label>Company Description</label>
-        <textarea rows="4" name="description" value={formData.description} onChange={handleChange} placeholder="Enter description" disabled={profileExists && !isEditing}></textarea>
+        <textarea
+          rows="4"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Enter description"
+          disabled={profileExists && !isEditing}
+        ></textarea>
 
         <label>Address</label>
-        <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Enter address" disabled={profileExists && !isEditing} />
+        <input
+          type="text"
+          name="address"
+          value={formData.address}
+          onChange={handleChange}
+          placeholder="Enter address"
+          disabled={profileExists && !isEditing}
+        />
 
         <label>Contact Email</label>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" disabled={profileExists && !isEditing} />
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Enter email address"
+          disabled={profileExists && !isEditing}
+        />
 
         <label>Contact Phone</label>
-        <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" disabled={profileExists && !isEditing} />
+        <input
+          type="text"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Enter phone number"
+          disabled={profileExists && !isEditing}
+        />
 
         <div className="upload-section">
           <label>Logo</label>
-          <input type="file" name="logo" accept="image/*" onChange={handleFileChange} disabled={profileExists && !isEditing} />
+          <input
+            type="file"
+            name="logo"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={profileExists && !isEditing}
+          />
           {logoFile && <p className="filename">{logoFile.name}</p>}
           {preview.logo && <img src={preview.logo} alt="Logo Preview" width="100" />}
         </div>
 
         <div className="upload-section">
           <label>Cover Image</label>
-          <input type="file" name="coverImage" accept="image/*" onChange={handleFileChange} disabled={profileExists && !isEditing} />
+          <input
+            type="file"
+            name="coverImage"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={profileExists && !isEditing}
+          />
           {coverFile && <p className="filename">{coverFile.name}</p>}
           {preview.coverImage && <img src={preview.coverImage} alt="Cover Preview" width="200" />}
         </div>
@@ -253,7 +313,13 @@ const Profile = () => {
               {profileExists ? 'Save Changes' : 'Create Profile'}
             </button>
           ) : (
-            <button type="button" onClick={() => setIsEditing(true)} className="edit-button">Edit</button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="edit-button"
+            >
+              Edit
+            </button>
           )}
         </div>
       </form>
