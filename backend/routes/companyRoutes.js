@@ -50,7 +50,7 @@ router.post('/companyProfile/create',
       res.status(201).json({ message: "Company profile created", company });
 
     } catch (err) {
-      console.error("❌ Error creating company:", err);
+      console.error("Error creating company:", err);
       res.status(500).json({ error: err.message });
     }
   }
@@ -108,7 +108,7 @@ router.put('/companyProfile/update',
       res.status(200).json({ message: "Company profile updated", company: updatedCompany });
 
     } catch (err) {
-      console.error("❌ Error updating company:", err);
+      console.error(" Error updating company:", err);
       res.status(500).json({ error: err.message });
     }
   }
@@ -125,9 +125,39 @@ router.get('/companyProfile', async (req, res) => {
 
     res.json(company);
   } catch (err) {
-    console.error("❌ Error fetching company:", err);
+    console.error(" Error fetching company:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
+router.get('/search', async (req, res) => {
+  const query = req.query.query || '';
+  const page = parseInt(req.query.page) || 1;
+  const limit = 6;
+
+  try {
+    const searchRegex = new RegExp(query, 'i');
+
+    const filter = {
+      $or: [
+        { name: searchRegex },
+        { industry: searchRegex },
+        { description: searchRegex }
+      ]
+    };
+
+    const results = await Company.find(filter)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await Company.countDocuments(filter);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({ results, totalPages });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 module.exports = router;

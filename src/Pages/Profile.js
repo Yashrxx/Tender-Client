@@ -41,6 +41,8 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileExists, setProfileExists] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [logoFile, setLogoFile] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
 
   const fetchProfile = async () => {
     try {
@@ -76,6 +78,7 @@ const Profile = () => {
         });
 
         setProfileExists(true);
+        setIsEditing(false);
       } else {
         setFormData({
           name: '',
@@ -95,6 +98,7 @@ const Profile = () => {
         });
 
         setProfileExists(false);
+        setIsEditing(true);
       }
     } catch {
       const user = JSON.parse(localStorage.getItem('user'));
@@ -116,6 +120,7 @@ const Profile = () => {
       });
 
       setProfileExists(false);
+      setIsEditing(true);
     } finally {
       setLoading(false);
     }
@@ -128,9 +133,6 @@ const Profile = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const [logoFile, setLogoFile] = useState(null);
-  const [coverFile, setCoverFile] = useState(null);
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
@@ -198,18 +200,18 @@ const Profile = () => {
 
       <form className="form" onSubmit={handleSubmit}>
         <label>Company Name</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Enter company name" disabled={!isEditing} />
+        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Enter company name" disabled={profileExists && !isEditing} />
 
         <label>Company Website</label>
-        <input type="text" name="website" value={formData.website} onChange={handleChange} placeholder="Enter website URL" disabled={!isEditing} />
+        <input type="text" name="website" value={formData.website} onChange={handleChange} placeholder="Enter website URL" disabled={profileExists && !isEditing} />
 
         <label htmlFor="category">Industry</label>
         <Select
-          disabled={!isEditing}
           options={companyCategories.map(cat => ({ value: cat, label: cat }))}
           value={formData.industry ? { value: formData.industry, label: formData.industry } : null}
           onChange={(selectedOption) => setFormData({ ...formData, industry: selectedOption.value })}
           placeholder="Select industry"
+          isDisabled={profileExists && !isEditing}
           styles={{
             menuList: (base) => ({
               ...base,
@@ -220,33 +222,33 @@ const Profile = () => {
         />
 
         <label>Company Description</label>
-        <textarea rows="4" name="description" value={formData.description} onChange={handleChange} placeholder="Enter description" disabled={!isEditing}></textarea>
+        <textarea rows="4" name="description" value={formData.description} onChange={handleChange} placeholder="Enter description" disabled={profileExists && !isEditing}></textarea>
 
         <label>Address</label>
-        <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Enter address" disabled={!isEditing} />
+        <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Enter address" disabled={profileExists && !isEditing} />
 
         <label>Contact Email</label>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" disabled={!isEditing} />
+        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" disabled={profileExists && !isEditing} />
 
         <label>Contact Phone</label>
-        <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" disabled={!isEditing} />
+        <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" disabled={profileExists && !isEditing} />
 
         <div className="upload-section">
           <label>Logo</label>
-          <input type="file" name="logo" accept="image/*" onChange={handleFileChange} disabled={!isEditing} />
+          <input type="file" name="logo" accept="image/*" onChange={handleFileChange} disabled={profileExists && !isEditing} />
           {logoFile && <p className="filename">{logoFile.name}</p>}
           {preview.logo && <img src={preview.logo} alt="Logo Preview" width="100" />}
         </div>
 
         <div className="upload-section">
           <label>Cover Image</label>
-          <input type="file" name="coverImage" accept="image/*" onChange={handleFileChange} disabled={!isEditing} />
+          <input type="file" name="coverImage" accept="image/*" onChange={handleFileChange} disabled={profileExists && !isEditing} />
           {coverFile && <p className="filename">{coverFile.name}</p>}
           {preview.coverImage && <img src={preview.coverImage} alt="Cover Preview" width="200" />}
         </div>
 
         <div className="button-wrapper">
-          {!profileExists || isEditing ? (
+          {(!profileExists || isEditing) ? (
             <button type="submit" className="save-button">
               {profileExists ? 'Save Changes' : 'Create Profile'}
             </button>

@@ -1,47 +1,95 @@
-import './Search.css'
+import './Search.css';
+import { useEffect, useState } from 'react';
 
 const Search = () => {
+  const [query, setQuery] = useState('');
+  const [companies, setCompanies] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/search?query=${query}&page=${page}`);
+        const data = await res.json();
+        setCompanies(data.results || []);
+        setTotalPages(data.totalPages || 1);
+      } catch (err) {
+        console.error('Failed to fetch companies', err);
+      }
+    };
+
+    fetchCompanies();
+  }, [query, page]);
+
+
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
+    setPage(1);
+  };
+
   return (
     <div className="company-page">
-    <h1>Find Companies</h1>
+      <h1>Find Companies</h1>
 
-    <input className="search-bar" type="text" placeholder="Search by company name, industry, or products/services" />
+      <input
+        className="search-bar"
+        type="text"
+        placeholder="Search by company name, industry, or products/services"
+        value={query}
+        onChange={handleInputChange}
+      />
 
-    <h3>Browse by Industry</h3>
-    <div className="industry-tags">
-      <span>Technology</span>
-      <span>Healthcare</span>
-      <span>Finance</span>
-      <span>Manufacturing</span>
-      <span>Retail</span>
-      <span>Energy</span>
-      <span>Transportation</span>
-      <span>Agriculture</span>
-      <span>Education</span>
-      <span>Government</span>
+      <h3>Browse by Industry</h3>
+      <div className="industry-tags">
+        {[
+          'Technology', 'Healthcare', 'Finance', 'Manufacturing', 'Retail',
+          'Energy', 'Transportation', 'Agriculture', 'Education', 'Government'
+        ].map((industry) => (
+          <span key={industry} onClick={() => { setQuery(industry); setPage(1); }}>
+            {industry}
+          </span>
+        ))}
+      </div>
+
+      <h3>Featured Companies</h3>
+      <div className="company-grid">
+        {companies.length > 0 ? (
+          companies.map((company, index) => (
+            <div key={index} className="company-card">
+              <img
+                src={company.logo || 'https://via.placeholder.com/100?text=Logo'}
+                alt={company.name}
+                style={{ borderRadius: '8px' }}
+              />
+              <h4>{company.name}</h4>
+              <p>{company.industry}</p>
+            </div>
+          ))
+        ) : (
+          <p>No companies found.</p>
+        )}
+      </div>
+
+      <div className="pagination">
+        <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
+          &lt;
+        </button>
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            className={page === i + 1 ? 'active' : ''}
+            onClick={() => setPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button onClick={() => setPage((p) => Math.min(p + 1, totalPages))} disabled={page === totalPages}>
+          &gt;
+        </button>
+      </div>
     </div>
+  );
+};
 
-    <h3>Featured Companies</h3>
-    <div className="company-grid">
-      <img src="company1.png" alt="Company 1" />
-      <img src="company2.png" alt="Company 2" />
-      <img src="company3.png" alt="Company 3" />
-      <img src="company4.png" alt="Company 4" />
-      <img src="company5.png" alt="Company 5" />
-      <img src="company6.png" alt="Company 6" />
-    </div>
-
-    <div className="pagination">
-      <button>&lt;</button>
-      <button className="active">1</button>
-      <button>2</button>
-      <button>3</button>
-      <button>4</button>
-      <button>5</button>
-      <button>&gt;</button>
-    </div>
-  </div>
-  )
-}
-
-export default Search
+export default Search;
