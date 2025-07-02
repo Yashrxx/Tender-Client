@@ -73,8 +73,8 @@ const Profile = () => {
         });
 
         setPreview({
-          logo: data.logo || 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
-          coverImage: data.coverImage || 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
+          logo: data.logo || 'https://prqpioqtpsjqzdmxdnrl.supabase.co/storage/v1/object/public/company-logos//whiteDressImg-1.jpg',
+          coverImage: data.coverImage || 'https://prqpioqtpsjqzdmxdnrl.supabase.co/storage/v1/object/public/company-coverimage//wallpaper-3.avif'
         });
 
         setProfileExists(true);
@@ -93,8 +93,8 @@ const Profile = () => {
         });
 
         setPreview({
-          logo: 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
-          coverImage: 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
+          logo: 'https://prqpioqtpsjqzdmxdnrl.supabase.co/storage/v1/object/public/company-logos//whiteDressImg-1.jpg',
+          coverImage: 'https://prqpioqtpsjqzdmxdnrl.supabase.co/storage/v1/object/public/company-coverimage//wallpaper-3.avif'
         });
 
         setProfileExists(false);
@@ -115,8 +115,8 @@ const Profile = () => {
       });
 
       setPreview({
-        logo: 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
-        coverImage: 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
+        logo: 'https://prqpioqtpsjqzdmxdnrl.supabase.co/storage/v1/object/public/company-logos//whiteDressImg-1.jpg',
+        coverImage: 'https://prqpioqtpsjqzdmxdnrl.supabase.co/storage/v1/object/public/company-coverimage//wallpaper-3.avif'
       });
 
       setProfileExists(false);
@@ -171,7 +171,6 @@ const Profile = () => {
         method,
         headers: {
           'auth-token': token,
-          'email': formData.email
         },
         body: submitData
       });

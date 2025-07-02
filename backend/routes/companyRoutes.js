@@ -5,10 +5,29 @@ const upload = require('../middleware/upLoad');
 const Company = require('../models/CompanySchema');
 const fetchCompany = require('../middleware/fetchCompany');
 const fetchUser = require('../middleware/fetchUser');
+const supabase = require('../utils/supabaseClient'); // ✅ Supabase
 
 const router = express.Router();
 
-// ✅ CREATE company profile (no fetchCompany here)
+// 🔄 Helper: Upload file to Supabase
+const uploadToSupabase = async (file, folder = 'logos') => {
+  if (!file) return null;
+
+  const fileBuffer = fs.readFileSync(file.path);
+  const filePath = `${folder}/${Date.now()}-${file.originalname}`;
+
+  const { data, error } = await supabase.storage
+    .from('company-logos')
+    .upload(filePath, fileBuffer, { contentType: file.mimetype });
+
+  fs.unlinkSync(file.path); // clean up temp file
+
+  if (error) throw new Error(error.message);
+
+  return supabase.storage.from('company-logos').getPublicUrl(data.path).data.publicUrl;
+};
+
+// ✅ CREATE company profile
 router.post('/companyProfile/create',
   fetchUser,
   upload.fields([
@@ -20,18 +39,14 @@ router.post('/companyProfile/create',
       const { name, website, industry, description, address, phone } = req.body;
       const email = req.user.email;
 
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const logo = req.files?.logo?.[0]
-        ? `${baseUrl}/uploads/${path.basename(req.files.logo[0].path)}`
-        : null;
-      const coverImage = req.files?.coverImage?.[0]
-        ? `${baseUrl}/uploads/${path.basename(req.files.coverImage[0].path)}`
-        : null;
-
       const existing = await Company.findOne({ user: req.user.id });
       if (existing) {
         return res.status(400).json({ error: "Company profile already exists" });
       }
+
+      // ✅ Upload to Supabase
+      const logo = req.files?.logo?.[0] ? await uploadToSupabase(req.files.logo[0], 'logos') : null;
+      const coverImage = req.files?.coverImage?.[0] ? await uploadToSupabase(req.files.coverImage[0], 'covers') : null;
 
       const company = new Company({
         user: req.user.id,
@@ -56,7 +71,7 @@ router.post('/companyProfile/create',
   }
 );
 
-// ✅ UPDATE company profile (needs fetchCompany)
+// ✅ UPDATE company profile
 router.put('/companyProfile/update',
   fetchUser,
   upload.fields([
@@ -69,25 +84,11 @@ router.put('/companyProfile/update',
       const { name, website, industry, description, address, phone } = req.body;
       const email = req.user.email;
 
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const logo = req.files?.logo?.[0]
-        ? `${baseUrl}/uploads/${path.basename(req.files.logo[0].path)}`
-        : null;
-      const coverImage = req.files?.coverImage?.[0]
-        ? `${baseUrl}/uploads/${path.basename(req.files.coverImage[0].path)}`
-        : null;
-
       const existing = req.company;
 
-      // delete old files if replaced
-      if (logo && existing.logo) {
-        const oldLogoPath = path.join(__dirname, '..', 'uploads', path.basename(existing.logo));
-        fs.existsSync(oldLogoPath) && fs.unlinkSync(oldLogoPath);
-      }
-      if (coverImage && existing.coverImage) {
-        const oldCoverPath = path.join(__dirname, '..', 'uploads', path.basename(existing.coverImage));
-        fs.existsSync(oldCoverPath) && fs.unlinkSync(oldCoverPath);
-      }
+      // ✅ Upload new files to Supabase if provided
+      const logo = req.files?.logo?.[0] ? await uploadToSupabase(req.files.logo[0], 'logos') : null;
+      const coverImage = req.files?.coverImage?.[0] ? await uploadToSupabase(req.files.coverImage[0], 'covers') : null;
 
       const updatedCompany = await Company.findByIdAndUpdate(
         existing._id,
@@ -108,7 +109,7 @@ router.put('/companyProfile/update',
       res.status(200).json({ message: "Company profile updated", company: updatedCompany });
 
     } catch (err) {
-      console.error(" Error updating company:", err);
+      console.error("Error updating company:", err);
       res.status(500).json({ error: err.message });
     }
   }
@@ -125,11 +126,12 @@ router.get('/companyProfile', async (req, res) => {
 
     res.json(company);
   } catch (err) {
-    console.error(" Error fetching company:", err);
+    console.error("Error fetching company:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
+// ✅ Get all companies
 router.get('/all', async (req, res) => {
   try {
     const companies = await Company.find();
@@ -140,6 +142,7 @@ router.get('/all', async (req, res) => {
   }
 });
 
+// ✅ Search companies
 router.get('/search', async (req, res) => {
   const query = req.query.query || '';
   const page = parseInt(req.query.page) || 1;
@@ -168,6 +171,5 @@ router.get('/search', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 
 module.exports = router;
