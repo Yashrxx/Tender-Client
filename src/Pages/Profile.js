@@ -39,6 +39,7 @@ const Profile = () => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [profileExists, setProfileExists] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async () => {
@@ -54,7 +55,7 @@ const Profile = () => {
       let data = null;
       try {
         data = await res.json();
-      } catch { }
+      } catch {}
 
       if (res.ok && data) {
         setFormData({
@@ -73,6 +74,8 @@ const Profile = () => {
           logo: data.logo || 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
           coverImage: data.coverImage || 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
         });
+
+        setProfileExists(true);
       } else {
         setFormData({
           name: '',
@@ -90,6 +93,8 @@ const Profile = () => {
           logo: 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
           coverImage: 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
         });
+
+        setProfileExists(false);
       }
     } catch {
       const user = JSON.parse(localStorage.getItem('user'));
@@ -109,6 +114,8 @@ const Profile = () => {
         logo: 'https://tender-client.onrender.com/uploads/1751308596115-TAT_Logo.jpeg',
         coverImage: 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
       });
+
+      setProfileExists(false);
     } finally {
       setLoading(false);
     }
@@ -155,8 +162,11 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile/${isEditing ? 'update' : 'create'}`, {
-        method: isEditing ? 'PUT' : 'POST',
+      const endpoint = profileExists ? 'update' : 'create';
+      const method = profileExists ? 'PUT' : 'POST';
+
+      const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile/${endpoint}`, {
+        method,
         headers: {
           'auth-token': token,
           'email': formData.email
@@ -168,20 +178,16 @@ const Profile = () => {
 
       if (res.ok) {
         alert('Profile saved successfully');
-        if (result?.message === "Company profile updated") {
-          setIsEditing(false);
-        } else {
-          setIsEditing(true);
-        }
+        setIsEditing(false);
+        setProfileExists(true);
         fetchProfile();
       } else {
         alert(result.error || 'Something went wrong');
       }
-    } catch (err) {
+    } catch {
       alert('Failed to submit profile');
     }
   };
-
 
   if (loading) return <p>Loading profile...</p>;
 
@@ -239,15 +245,15 @@ const Profile = () => {
           {preview.coverImage && <img src={preview.coverImage} alt="Cover Preview" width="200" />}
         </div>
 
-        {isEditing ? (
-          <div className="button-wrapper">
-            <button type="submit" className="save-button">Save Changes</button>
-          </div>
-        ) : (
-          <div className="button-wrapper">
+        <div className="button-wrapper">
+          {!profileExists || isEditing ? (
+            <button type="submit" className="save-button">
+              {profileExists ? 'Save Changes' : 'Create Profile'}
+            </button>
+          ) : (
             <button type="button" onClick={() => setIsEditing(true)} className="edit-button">Edit</button>
-          </div>
-        )}
+          )}
+        </div>
       </form>
     </div>
   );
