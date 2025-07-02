@@ -166,11 +166,18 @@ const Profile = () => {
       const result = await res.json();
       if (res.ok) {
         alert('Profile saved successfully');
-        setIsEditing(false);
+
+        if (result?.message === "Company profile updated") {
+          setIsEditing(false);
+        } else {
+          setIsEditing(true);
+        }
+
         fetchProfile();
       } else {
         alert(result.error || 'Something went wrong');
       }
+
     } catch {
       alert('Failed to submit profile');
     }
