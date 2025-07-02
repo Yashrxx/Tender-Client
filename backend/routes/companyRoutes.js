@@ -5,7 +5,7 @@ const upload = require('../middleware/upLoad');
 const Company = require('../models/CompanySchema');
 const fetchCompany = require('../middleware/fetchCompany');
 const fetchUser = require('../middleware/fetchUser');
-const supabase = require('../utils/supabaseClient'); // ✅ Supabase
+const supabase = require('../supabaseClient');
 
 const router = express.Router();
 
