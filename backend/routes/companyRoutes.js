@@ -4,8 +4,17 @@ const path = require('path');
 const upload = require('../middleware/upLoad');
 const Company = require('../models/CompanySchema');
 const fetchCompany = require('../middleware/fetchCompany');
-const fetchUser = require('../middleware/fetchUser')
+const fetchUser = require('../middleware/fetchUser');
+
 const router = express.Router();
+
+// ✅ Debug log to confirm this file is loaded
+console.log("✅ companyRoutes.js loaded");
+
+// ✅ Simple test route to verify import
+router.get('/test', (req, res) => {
+  res.send("✅ companyRoutes is working!");
+});
 
 router.post('/companyProfile',
   fetchUser,
@@ -16,6 +25,8 @@ router.post('/companyProfile',
   fetchCompany,
   async (req, res) => {
     try {
+      console.log("📦 Incoming companyProfile request");
+
       const {
         name,
         website,
@@ -56,6 +67,7 @@ router.post('/companyProfile',
       };
 
       if (existing) {
+        // Delete old images if replaced
         if (logo && existing.logo) {
           const oldLogoPath = path.join(__dirname, '..', 'uploads', path.basename(existing.logo));
           fs.existsSync(oldLogoPath) && fs.unlinkSync(oldLogoPath);
@@ -75,7 +87,7 @@ router.post('/companyProfile',
       res.status(201).json({ message: "Company profile created", company: newCompany });
 
     } catch (err) {
-      console.error("Error in company profile:", err);
+      console.error("❌ Error in company profile:", err);
       res.status(500).json({ error: err.message });
     }
   }
@@ -96,7 +108,7 @@ router.get('/companyProfile', async (req, res) => {
 
     res.json(company);
   } catch (err) {
-    console.error("Error fetching company:", err);
+    console.error("❌ Error fetching company:", err);
     res.status(500).json({ error: err.message });
   }
 });
