@@ -1,4 +1,4 @@
-import './Profile.css'; 
+import './Profile.css';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 
@@ -45,11 +45,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user'));
-
-      if (!user?.email) {
-        console.error("User email not found in localStorage");
-        return setLoading(false);
-      }
+      if (!user?.email) return setLoading(false);
 
       const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile?email=${user.email}`, {
         headers: { 'auth-token': token }
@@ -58,9 +54,7 @@ const Profile = () => {
       let data = null;
       try {
         data = await res.json();
-      } catch {
-        console.warn("Failed to parse JSON response");
-      }
+      } catch {}
 
       if (res.ok && data) {
         setFormData({
@@ -80,8 +74,6 @@ const Profile = () => {
           coverImage: data.coverImage || 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
         });
       } else {
-        console.warn("Company profile not found — using fallback");
-
         setFormData({
           name: '',
           website: '',
@@ -99,10 +91,8 @@ const Profile = () => {
           coverImage: 'https://tender-client.onrender.com/uploads/1751308596116-wood-blk-bg.jpg'
         });
       }
-    } catch (err) {
-      console.error("Fetch failed:", err);
+    } catch {
       const user = JSON.parse(localStorage.getItem('user'));
-
       setFormData({
         name: 'yash',
         website: 'https://yashrx@gmail.com',
@@ -181,8 +171,7 @@ const Profile = () => {
       } else {
         alert(result.error || 'Something went wrong');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert('Failed to submit profile');
     }
   };
@@ -206,9 +195,7 @@ const Profile = () => {
           disabled={!isEditing}
           options={companyCategories.map(cat => ({ value: cat, label: cat }))}
           value={formData.industry ? { value: formData.industry, label: formData.industry } : null}
-          onChange={(selectedOption) =>
-            setFormData({ ...formData, industry: selectedOption.value })
-          }
+          onChange={(selectedOption) => setFormData({ ...formData, industry: selectedOption.value })}
           placeholder="Select industry"
           styles={{
             menuList: (base) => ({
