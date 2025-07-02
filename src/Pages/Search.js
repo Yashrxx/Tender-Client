@@ -68,12 +68,14 @@ const Search = () => {
               onClick={() => handleCompanyClick(company)}
             >
               <img
-                src={company.logoUrl
-                  ? `https://tender-client.onrender.com/${company.logoUrl}`
-                  : 'https://via.placeholder.com/100?text=Logo'}
+                src={
+                  company.logo
+                    ? company.logo
+                    : 'https://dummyimage.com/100x100/cccccc/000000.png&text=Logo'
+                }
                 alt={company.name}
-                style={{ borderRadius: '8px' }}
-              />
+                style={{borderRadius: '8px',width: '100px',height: '100px',objectFit: 'cover',boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'}}/>
+
               <h4>{company.name}</h4>
               <p>{company.industry || company.category}</p>
             </div>
