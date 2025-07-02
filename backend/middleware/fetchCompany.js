@@ -2,13 +2,14 @@ const Company = require('../models/CompanySchema');
 
 const fetchCompany = async (req, res, next) => {
   try {
-    const email = req.user?.email; // ✅ comes from token via fetchUser
+    const userId = req.user?.id; // Comes from token via fetchUser
 
-    if (!email) {
-      return res.status(400).json({ error: "Authenticated email not found" });
+    if (!userId) {
+      return res.status(400).json({ error: "User ID not found in token" });
     }
 
-    const company = await Company.findOne({ email });
+    const company = await Company.findOne({ user: userId });
+
     if (!company) {
       return res.status(404).json({ error: "Company not found" });
     }

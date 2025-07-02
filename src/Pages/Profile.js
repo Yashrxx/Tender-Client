@@ -54,7 +54,7 @@ const Profile = () => {
       let data = null;
       try {
         data = await res.json();
-      } catch {}
+      } catch { }
 
       if (res.ok && data) {
         setFormData({
@@ -155,8 +155,8 @@ const Profile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://tender-client.onrender.com/api/companyRoutes/companyProfile', {
-        method: 'POST',
+      const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile/${isEditing ? 'update' : 'create'}`, {
+        method: isEditing ? 'PUT' : 'POST',
         headers: {
           'auth-token': token
         },
