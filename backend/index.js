@@ -41,14 +41,15 @@ app.use(
   })
 );
 
+// ✅ JSON and URL parser — must come BEFORE any route
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
+
 // ✅ Static file serving (for logo and coverImage URLs)
 app.use('/uploads', express.static('uploads'));
 
 // ✅ Route that DOES NOT use multipart/form-data — SAFE for JSON parser
 app.use('/api/auth', authRoutes);
-
-// ✅ JSON parser here — AFTER /auth and BEFORE other routes
-app.use(express.json());
 
 // ✅ Routes like this one use file uploads (multipart/form-data)
 app.use('/api/companyRoutes', companyRoutes);
