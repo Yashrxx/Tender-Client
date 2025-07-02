@@ -48,6 +48,8 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Static file serving (for logo and coverImage URLs)
 app.use('/uploads', express.static('uploads'));
 
+app.use('/api/companies', require('./routes/companyRoutes'));
+
 // ✅ Route that DOES NOT use multipart/form-data — SAFE for JSON parser
 app.use('/api/auth', authRoutes);
 

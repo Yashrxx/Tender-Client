@@ -1,11 +1,14 @@
 import './Search.css';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Search = () => {
   const [query, setQuery] = useState('');
   const [companies, setCompanies] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -22,10 +25,13 @@ const Search = () => {
     fetchCompanies();
   }, [query, page]);
 
-
   const handleInputChange = (e) => {
     setQuery(e.target.value);
     setPage(1);
+  };
+
+  const handleCompanyClick = (company) => {
+    navigate(`/company/${company._id}`, { state: { company } });
   };
 
   return (
@@ -56,14 +62,20 @@ const Search = () => {
       <div className="company-grid">
         {companies.length > 0 ? (
           companies.map((company, index) => (
-            <div key={index} className="company-card">
+            <div
+              key={index}
+              className="company-card"
+              onClick={() => handleCompanyClick(company)}
+            >
               <img
-                src={company.logo || 'https://via.placeholder.com/100?text=Logo'}
+                src={company.logoUrl
+                  ? `https://tender-client.onrender.com/${company.logoUrl}`
+                  : 'https://via.placeholder.com/100?text=Logo'}
                 alt={company.name}
                 style={{ borderRadius: '8px' }}
               />
               <h4>{company.name}</h4>
-              <p>{company.industry}</p>
+              <p>{company.industry || company.category}</p>
             </div>
           ))
         ) : (

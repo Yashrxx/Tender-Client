@@ -130,6 +130,16 @@ router.get('/companyProfile', async (req, res) => {
   }
 });
 
+router.get('/all', async (req, res) => {
+  try {
+    const companies = await Company.find();
+    res.json(companies);
+  } catch (error) {
+    console.error('Error fetching companies:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 router.get('/search', async (req, res) => {
   const query = req.query.query || '';
   const page = parseInt(req.query.page) || 1;

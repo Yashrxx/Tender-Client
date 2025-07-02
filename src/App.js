@@ -10,6 +10,7 @@ import Navbar from "./headers/Navbar";
 import Profile from "./Pages/Profile";
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from './context/userContext';
+import CompanyDetails from "./Pages/companyDetails";
 
 function App() {
   const { setIsAuthenticated, username } = useContext(UserContext);
@@ -50,6 +51,7 @@ function App() {
         <Route path="/" element={<Login mode={mode}/>} />
         <Route path="/signup" element={<Signup mode={mode}/>} />
         <Route path="/profile" element={<Profile mode={mode}/>} />
+        <Route path="/company/:id" element={<CompanyDetails />} />
         <Route path="/dashboard" element={<Dashboard mode={mode}/>} />
         <Route path="/tenders" element={<Tenders mode={mode}/>} />
         <Route path="/applications" element={<Applications mode={mode}/>} />
