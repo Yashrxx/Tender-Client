@@ -67,13 +67,9 @@ router.get('/newTender', fetchUser, async (req, res) => {
 
     let userTenders;
     try {
-      // Convert string id to ObjectId using 'new'
-      const userId = new mongoose.Types.ObjectId(req.user.id);
-
-      userTenders = await Application.find({ 'company._id': userId })
-        .sort({ createdAt: -1 });
-
-      console.log('Fetched tenders:', userTenders.length);
+      const userId = new mongoose.Types.ObjectId(req.user.id); // <-- convert string to ObjectId
+      userTenders = await Application.find({ user: userId }).sort({ createdAt: -1 });
+      console.log('Fetched tender data:', userTenders);
     } catch (err) {
       console.error('Mongo query failed:', err);
       return res.status(500).json({ error: 'Database query failed' });
