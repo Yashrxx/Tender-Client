@@ -1,16 +1,17 @@
 {
   "files": {
-    "main.css": "/Tender-Client/static/css/main.1cd502c8.css",
-    "main.js": "/Tender-Client/static/js/main.df7cef47.js",
+    "main.css": "/Tender-Client/static/css/main.45b3751b.css",
+    "main.js": "/Tender-Client/static/js/main.e659a0dc.js",
     "static/js/453.29baae0c.chunk.js": "/Tender-Client/static/js/453.29baae0c.chunk.js",
+    "static/media/WhatsApp Image 2025-06-28 at 5.10.49 PM.jpeg": "/Tender-Client/static/media/WhatsApp Image 2025-06-28 at 5.10.49 PM.c1522a89953661829aa6.jpeg",
     "static/media/TAT_Logo.jpeg": "/Tender-Client/static/media/TAT_Logo.f3506ade23c4ee9b2fa1.jpeg",
     "index.html": "/Tender-Client/index.html",
-    "main.1cd502c8.css.map": "/Tender-Client/static/css/main.1cd502c8.css.map",
-    "main.df7cef47.js.map": "/Tender-Client/static/js/main.df7cef47.js.map",
+    "main.45b3751b.css.map": "/Tender-Client/static/css/main.45b3751b.css.map",
+    "main.e659a0dc.js.map": "/Tender-Client/static/js/main.e659a0dc.js.map",
     "453.29baae0c.chunk.js.map": "/Tender-Client/static/js/453.29baae0c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1cd502c8.css",
-    "static/js/main.df7cef47.js"
+    "static/css/main.45b3751b.css",
+    "static/js/main.e659a0dc.js"
   ]
 }
