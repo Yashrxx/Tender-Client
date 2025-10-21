@@ -8,6 +8,7 @@ import Applications from "./Pages/Applications";
 import Search from "./Pages/Search";
 import Navbar from "./headers/Navbar";
 import Profile from "./Pages/Profile";
+import About from "./Pages/About";
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from './context/userContext';
 import CompanyDetails from "./Pages/companyDetails";
@@ -51,11 +52,12 @@ function App() {
         <Route path="/" element={<Login mode={mode}/>} />
         <Route path="/signup" element={<Signup mode={mode}/>} />
         <Route path="/profile" element={<Profile mode={mode}/>} />
-        <Route path="/company/:id" element={<CompanyDetails />} />
+        <Route path="/company/:id" element={<CompanyDetails mode={mode}/>} />
         <Route path="/dashboard" element={<Dashboard mode={mode}/>} />
         <Route path="/tenders" element={<Tenders mode={mode}/>} />
         <Route path="/applications" element={<Applications mode={mode}/>} />
         <Route path="/search" element={<Search mode={mode}/>} />
+        <Route path="/about" element={<About mode={mode}/>} />
       </Routes>
     </Router>
   );

@@ -1,25 +1,49 @@
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './companyDetails.css';
 
-const CompanyDetails = () => {
+const CompanyDetails = ({ mode }) => {
     const { state } = useLocation();
-    const company = state?.company;
+    const [company, setCompany] = useState(state?.company || null);
+    const [loading, setLoading] = useState(true);
 
-    if (!company) return <div>No company data found.</div>;
+    useEffect(() => {
+        const fetchCompany = async () => {
+
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('authToken');
+                const userEmail = localStorage.getItem('email');
+
+                const res = await fetch(`https://tender-client.onrender.com/api/companyRoutes/companyProfile?email=${userEmail}`, {
+                    method: 'GET', // GET is default, optional
+                    headers: {
+                        'auth-token': token,
+                    },
+                });
+                const data = await res.json();
+                setCompany(data);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching company:', err);
+            }
+        };
+        fetchCompany();
+    }, []);
+
+    if (!company) 
+        return <div className="loading-spinner"></div>
+    
 
     return (
         <div className="company-details">
             <img
-                src={company.coverImage
-                    ? company.coverImage
-                    : 'https://dummyimage.com/600x200/cccccc/000000.png&text=Cover'}
+                src={company.coverImage || 'https://dummyimage.com/600x200/cccccc/000000.png&text=Cover'}
                 alt="Cover"
                 className="cover-image"
             />
             <img
-                src={company.logo
-                    ? company.logo
-                    : 'https://dummyimage.com/100x100/cccccc/000000.png&text=Logo'}
+                src={company.logo || 'https://dummyimage.com/100x100/cccccc/000000.png&text=Logo'}
                 alt="Logo"
                 className="logo"
             />
@@ -59,9 +83,8 @@ const CompanyDetails = () => {
                     </tbody>
                 </table>
             </div>
-
         </div>
-    );
+    )
 };
 
 export default CompanyDetails;

@@ -1,128 +1,206 @@
-import './Dashboard.css'
+import './Dashboard.css';
+import { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../context/userContext';
+import { Link } from 'react-router-dom';
 
-const Dashboard = () => {
+const Dashboard = ({ mode }) => {
+  const { user } = useContext(UserContext);
+  const [tenders, setTenders] = useState([]);
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [loading, setLoading] = useState(true);
+
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+  };
+
+  const toggleDescription = (index) => {
+    setExpandedDescriptions((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    return isNaN(date.getTime())
+      ? 'N/A'
+      : date.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+        });
+  };
+
+  useEffect(() => {
+    const fetchCompanyTenders = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(
+          "https://tender-client.onrender.com/api/tenderRoutes/newTender",
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'auth-token': token,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('Error fetching tenders:', errorData);
+          setTenders([]);
+        } else {
+          const data = await res.json();
+          console.log('Fetched company tenders:', data);
+          setTenders(data || []);
+        }
+      } catch (err) {
+        console.error("Error fetching company's tenders:", err);
+        setTenders([]);
+      }
+      setLoading(false);
+    };
+
+    if (user?.id) {
+      fetchCompanyTenders();
+    } else {
+      setLoading(false);
+      setTenders([]);
+    }
+  }, [user]);
+
+  // Pre-filter tenders by selected category
+  const filteredTenders =
+    selectedCategory === 'All'
+      ? tenders
+      : tenders.filter((tender) => tender.category === selectedCategory);
+
+  const categories = [
+    'All',
+    'Construction & Civil Works',
+    'Information Technology (IT)',
+    'Electrical Equipment & Works',
+    'Healthcare & Medical Equipment',
+    'Roads & Bridges',
+    'Education & Training',
+    'Consultancy Services',
+    'Agriculture & Allied Services',
+    'Transportation & Logistics',
+    'Telecommunications',
+    'Security Services',
+    'Water Supply & Sanitation',
+    'Office Equipment & Stationery',
+    'Environmental Services',
+    'Machinery & Industrial Supplies',
+  ];
+
   return (
-    <div>
-      <div className="tenders-container">
-        <div className="header">
-          <h1>Tenders</h1>
-          <button className="new-tender">New Tender</button>
-        </div>
-
-        <div className="filters">
-          <button>Status ⌄</button>
-          <button>Category ⌄</button>
-          <button>Region ⌄</button>
-          <button>Published Date ⌄</button>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Tender</th>
-              <th>Category</th>
-              <th>Region</th>
-              <th>Status</th>
-              <th>Published Date</th>
-              <th>Closing Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Construction of New Office Building</td>
-              <td className="link">Construction</td>
-              <td className="link">Midwest</td>
-              <td><span className="status open">Open</span></td>
-              <td>2024-01-15</td>
-              <td>2024-02-29</td>
-            </tr>
-            <tr>
-              <td>Supply of IT Equipment</td>
-              <td className="link">Technology</td>
-              <td className="link">Northeast</td>
-              <td><span className="status closed">Closed</span></td>
-              <td>2023-12-20</td>
-              <td>2024-01-10</td>
-            </tr>
-            <tr>
-              <td>Marketing Services for Product Launch</td>
-              <td className="link">Marketing</td>
-              <td className="link">Southeast</td>
-              <td><span className="status open">Open</span></td>
-              <td>2024-01-20</td>
-              <td>2024-03-15</td>
-            </tr>
-            <tr>
-              <td>Renovation of Existing Facility</td>
-              <td className="link">Construction</td>
-              <td className="link">Southwest</td>
-              <td><span className="status open">Open</span></td>
-              <td>2024-01-25</td>
-              <td>2024-03-30</td>
-            </tr>
-            <tr>
-              <td>Procurement of Medical Supplies</td>
-              <td className="link">Healthcare</td>
-              <td className="link">Midwest</td>
-              <td><span className="status closed">Closed</span></td>
-              <td>2023-12-10</td>
-              <td>2024-01-05</td>
-            </tr>
-            <tr>
-              <td>Consulting Services for Business Strategy</td>
-              <td className="link">Consulting</td>
-              <td className="link">Northeast</td>
-              <td><span className="status open">Open</span></td>
-              <td>2024-02-01</td>
-              <td>2024-04-15</td>
-            </tr>
-            <tr>
-              <td>Supply of Office Furniture</td>
-              <td className="link">Office Supplies</td>
-              <td className="link">Southeast</td>
-              <td><span className="status open">Open</span></td>
-              <td>2024-02-05</td>
-              <td>2024-04-30</td>
-            </tr>
-            <tr>
-              <td>Development of Mobile Application</td>
-              <td className="link">Technology</td>
-              <td className="link">Southwest</td>
-              <td><span className="status closed">Closed</span></td>
-              <td>2023-11-25</td>
-              <td>2023-12-20</td>
-            </tr>
-            <tr>
-              <td>Training Services for Employee Development</td>
-              <td className="link">Training</td>
-              <td className="link">Midwest</td>
-              <td><span className="status open">Open</span></td>
-              <td>2024-02-10</td>
-              <td>2024-05-15</td>
-            </tr>
-            <tr>
-              <td>Maintenance of Existing Infrastructure</td>
-              <td className="link">Maintenance</td>
-              <td className="link">Northeast</td>
-              <td><span className="status open">Open</span></td>
-              <td>2024-02-15</td>
-              <td>2024-05-30</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div className="pagination">
-          <button>&lt;</button>
-          <button className="active">1</button>
-          <button>2</button>
-          <button>3</button>
-          <span>...</span>
-          <button>10</button>
-          <button>&gt;</button>
-        </div>
+    <div className={`tenders-container ${mode === 'dark' ? 'dark-mode' : ''}`}>
+      <div className="header">
+        <h1>My Tenders</h1>
+        <Link className="new-tender" to="/applications">
+          New Tender
+        </Link>
       </div>
-    </div>
-  )
-}
 
-export default Dashboard
+      <div className="filters-scroll">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => handleCategoryClick(cat)}
+            className={`category-button ${
+              selectedCategory === cat ? 'active-filter' : ''
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="loading-spinner"></div>
+      ) : filteredTenders.length === 0 ? (
+        <div
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            padding: '2rem',
+            color: '#6b7280',
+          }}
+        >
+          <p style={{ fontSize: '1.1rem' }}>
+            🚫 No tenders found for <strong>{selectedCategory}</strong>.
+          </p>
+        </div>
+      ) : (
+        <div className="tender-cards-container">
+          {filteredTenders.map((tender, index) => (
+            <div className="tender-card" key={tender._id || index}>
+              <div className="card-header">
+                <h3>{tender.title}</h3>
+                <span
+                  className={`status-chip ${tender.status?.toLowerCase() || 'open'}`}
+                >
+                  {tender.status || 'Open'}
+                </span>
+              </div>
+
+              <p className="category-chip">{tender.category}</p>
+
+              <div className="card-body">
+                <p>
+                  <strong>Location:</strong> {tender.location || 'N/A'}
+                </p>
+                <p>
+                  <strong>Deadline:</strong> {formatDate(tender.deadline)}
+                </p>
+                <p>
+                  <strong>Published:</strong> {formatDate(tender.createdAt)}
+                </p>
+                <p>
+                  <strong>Budget:</strong> ₹{tender.budget || 'N/A'}
+                </p>
+
+                {tender.company && (
+                  <>
+                    <p>
+                      <strong>Company:</strong> {tender.company.name || 'N/A'}
+                    </p>
+                    <p>
+                      <strong>Phone:</strong> {tender.company.phone || 'N/A'}
+                    </p>
+                  </>
+                )}
+              </div>
+
+              {tender.description.length > 200 ? (
+                <button
+                  onClick={() => toggleDescription(index)}
+                  className="view-more-btn"
+                >
+                  {expandedDescriptions[index] ? 'View Less ↑' : 'View More →'}
+                </button>
+              ) : (
+                <p className="description">
+                  <strong>Description:</strong> {tender.description}
+                </p>
+              )}
+
+              {expandedDescriptions[index] && (
+                <div className="description">
+                  <strong>Description:</strong> {tender.description}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Dashboard;

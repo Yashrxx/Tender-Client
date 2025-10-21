@@ -55,12 +55,14 @@ router.post('/application', fetchUser, async (req, res) => {
 // GET /api/newTender (protected)
 router.get('/newTender', fetchUser, async (req, res) => {
   try {
-    const userTenders = await Application.find({ user: req.user.id });
+    // Fetch tenders created by this logged-in company
+    const userTenders = await Tender.find({ 'company._id': req.user.id }).sort({ createdAt: -1 });
     res.json(userTenders);
   } catch (err) {
     console.error('Error fetching tenders:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 module.exports = router;
