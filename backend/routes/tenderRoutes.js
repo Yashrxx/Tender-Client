@@ -67,8 +67,8 @@ router.get('/newTender', fetchUser, async (req, res) => {
 
     let userTenders;
     try {
-      // Convert string id to ObjectId for Mongo query
-      const userId = mongoose.Types.ObjectId(req.user.id);
+      // Convert string id to ObjectId using 'new'
+      const userId = new mongoose.Types.ObjectId(req.user.id);
 
       userTenders = await Application.find({ 'company._id': userId })
         .sort({ createdAt: -1 });
