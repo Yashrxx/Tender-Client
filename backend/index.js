@@ -23,6 +23,7 @@ const companyRoutes = require('./routes/companyRoutes');
 
 // ✅ CORS config
 const allowedOrigins = [
+   "http://localhost:3000",
   "http://localhost:3001",
   "https://yashrxx.github.io"
 ];

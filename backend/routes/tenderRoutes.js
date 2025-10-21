@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Application = require("../models/ApplicationSchema");
-const Company = require("../models/CompanySchema")
+const Company = require("../models/CompanySchema");
 const fetchUser = require('../middleware/fetchUser');
 
+// POST /api/tenderRoutes/application
 router.post('/application', fetchUser, async (req, res) => {
   try {
     const { title, description, deadline, budget, category, location } = req.body;
@@ -11,10 +13,11 @@ router.post('/application', fetchUser, async (req, res) => {
     if (!title || !description || !deadline || !budget) {
       return res.status(400).json({ error: "All fields are required" });
     }
+
     const userEmail = req.user.email;
     console.log("User email from token:", req.user);
-    const company = await Company.findOne({ email: userEmail });
 
+    const company = await Company.findOne({ email: userEmail });
     if (!company) {
       return res.status(404).json({ error: "Company profile not found" });
     }
@@ -43,6 +46,7 @@ router.post('/application', fetchUser, async (req, res) => {
     });
 
     await newTender.save();
+    console.log("Tender saved:", newTender._id);
 
     res.status(201).json({ message: 'Tender published successfully', tender: newTender });
 
@@ -52,17 +56,35 @@ router.post('/application', fetchUser, async (req, res) => {
   }
 });
 
-// GET /api/newTender (protected)
+// GET /api/tenderRoutes/newTender
 router.get('/newTender', fetchUser, async (req, res) => {
   try {
-    // Fetch tenders created by this logged-in company
-    const userTenders = await Tender.find({ 'company._id': req.user.id }).sort({ createdAt: -1 });
-    res.json(userTenders);
+    console.log('Logged-in user:', req.user);
+
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ error: 'Invalid user' });
+    }
+
+    let userTenders;
+    try {
+      // Convert string id to ObjectId for Mongo query
+      const userId = mongoose.Types.ObjectId(req.user.id);
+
+      userTenders = await Application.find({ 'company._id': userId })
+        .sort({ createdAt: -1 });
+
+      console.log('Fetched tenders:', userTenders.length);
+    } catch (err) {
+      console.error('Mongo query failed:', err);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+
+    res.json(Array.isArray(userTenders) ? userTenders : []);
+
   } catch (err) {
-    console.error('Error fetching tenders:', err);
+    console.error('Unexpected server error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 
 module.exports = router;

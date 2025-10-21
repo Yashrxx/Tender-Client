@@ -24,61 +24,90 @@ const Tenders = ({ mode }) => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`https://tender-client.onrender.com/api/tenderRoutes/newTender`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'auth-token': token,
-          },
-        });
+        const res = await fetch(
+          'https://tender-client.onrender.com/api/tenderRoutes/newTender',
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'auth-token': token,
+            },
+          }
+        );
 
-        let data;
-        const contentType = res.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          data = await res.json();
-        } else {
-          console.error('Unexpected response:', await res.text());
-          data = [];
+        if (!res.ok) {
+          console.error('HTTP error:', res.status);
+          setAllTenders([]);
+          setFilteredTenders([]);
+          return;
         }
 
-        setAllTenders(data || []);
-        setFilteredTenders(data || []);
+        const data = await res.json();
+        console.log('Fetched tender data:', data);
+
+        // Ensure we always have an array
+        const tendersArray = Array.isArray(data) ? data : [];
+        setAllTenders(tendersArray);
+        setFilteredTenders(tendersArray);
       } catch (err) {
         console.error('Error fetching tenders:', err);
+        setAllTenders([]);
+        setFilteredTenders([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTenders();
+    if (user) fetchTenders();
   }, [user]);
 
   // Filtering tenders
   useEffect(() => {
-    let results = [...allTenders];
+    let results = Array.isArray(allTenders) ? [...allTenders] : [];
 
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
-      results = results.filter(t =>
-        t.title?.toLowerCase().includes(q) ||
-        t.description?.toLowerCase().includes(q) ||
-        t.company?.name?.toLowerCase().includes(q)
+      results = results.filter(
+        (t) =>
+          t.title?.toLowerCase().includes(q) ||
+          t.description?.toLowerCase().includes(q) ||
+          t.company?.name?.toLowerCase().includes(q)
       );
     }
 
-    if (filters.category !== 'All') results = results.filter(t => t.category === filters.category);
-    if (filters.location !== 'All') results = results.filter(t => t.location === filters.location);
-    if (filters.status !== 'All') results = results.filter(t => t.status === filters.status);
-    if (filters.date === 'Upcoming') results = results.filter(t => new Date(t.deadline) > new Date());
-    if (filters.date === 'Past') results = results.filter(t => new Date(t.deadline) < new Date());
+    if (filters.category !== 'All')
+      results = results.filter((t) => t.category === filters.category);
+    if (filters.location !== 'All')
+      results = results.filter((t) => t.location === filters.location);
+    if (filters.status !== 'All')
+      results = results.filter((t) => t.status === filters.status);
+    if (filters.date === 'Upcoming')
+      results = results.filter((t) => new Date(t.deadline) > new Date());
+    if (filters.date === 'Past')
+      results = results.filter((t) => new Date(t.deadline) < new Date());
 
     setFilteredTenders(results);
   }, [allTenders, searchQuery, filters]);
 
   // Unique filter options
-  const uniqueCategories = ['All', ...new Set(allTenders.map(t => t.category))];
-  const uniqueLocations = ['All', ...new Set(allTenders.map(t => t.location))];
-  const uniqueStatuses = ['All', ...new Set(allTenders.map(t => t.status))];
+  const uniqueCategories = [
+    'All',
+    ...(Array.isArray(allTenders)
+      ? [...new Set(allTenders.map((t) => t.category))]
+      : []),
+  ];
+  const uniqueLocations = [
+    'All',
+    ...(Array.isArray(allTenders)
+      ? [...new Set(allTenders.map((t) => t.location))]
+      : []),
+  ];
+  const uniqueStatuses = [
+    'All',
+    ...(Array.isArray(allTenders)
+      ? [...new Set(allTenders.map((t) => t.status))]
+      : []),
+  ];
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -86,16 +115,16 @@ const Tenders = ({ mode }) => {
   };
 
   const handleRowClick = (index) => {
-    setExpandedRow(prev => (prev === index ? null : index));
+    setExpandedRow((prev) => (prev === index ? null : index));
     setTimeout(() => {
       rowRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 50);
   };
 
   const toggleDescription = (index) => {
-    setExpandedDescriptions(prev => ({
+    setExpandedDescriptions((prev) => ({
       ...prev,
-      [index]: !prev[index]
+      [index]: !prev[index],
     }));
   };
 
@@ -111,19 +140,51 @@ const Tenders = ({ mode }) => {
         />
         <h3>Filters</h3>
 
-        <select value={filters.category} onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}>
-          {uniqueCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+        <select
+          value={filters.category}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, category: e.target.value }))
+          }
+        >
+          {uniqueCategories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
         </select>
 
-        <select value={filters.location} onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}>
-          {uniqueLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+        <select
+          value={filters.location}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, location: e.target.value }))
+          }
+        >
+          {uniqueLocations.map((loc) => (
+            <option key={loc} value={loc}>
+              {loc}
+            </option>
+          ))}
         </select>
 
-        <select value={filters.status} onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}>
-          {uniqueStatuses.map(stat => <option key={stat} value={stat}>{stat}</option>)}
+        <select
+          value={filters.status}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, status: e.target.value }))
+          }
+        >
+          {uniqueStatuses.map((stat) => (
+            <option key={stat} value={stat}>
+              {stat}
+            </option>
+          ))}
         </select>
 
-        <select value={filters.date} onChange={(e) => setFilters(prev => ({ ...prev, date: e.target.value }))}>
+        <select
+          value={filters.date}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, date: e.target.value }))
+          }
+        >
           <option value="All">All</option>
           <option value="Upcoming">Upcoming</option>
           <option value="Past">Past</option>
@@ -147,59 +208,81 @@ const Tenders = ({ mode }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredTenders.map((tender, index) => (
-                  <Fragment key={tender._id}>
-                    <tr onClick={() => handleRowClick(index)} ref={el => rowRefs.current[index] = el} className="cursor-pointer">
-                      <td>{tender.title}</td>
-                      <td className="text-blue">{tender.category}</td>
-                      <td className="text-blue">{tender.location}</td>
-                      <td>
-                        <span className="status-badge">{tender.status}</span>
-                      </td>
-                      <td>{formatDate(tender.deadline)}</td>
-                    </tr>
-
-                    {expandedRow === index && (
-                      <tr>
-                        <td colSpan="5">
-                          <div className={`dropdown-details ${mode === 'dark' ? 'dark-dropdown' : ''}`}>
-                            <p>
-                              <strong>Description:</strong>{' '}
-                              {expandedDescriptions[index]
-                                ? tender.description
-                                : `${tender.description.slice(0, 200)}...`}
-                            </p>
-
-                            {tender.company ? (
-                              <>
-                                <p><strong>Company:</strong> {tender.company.name}</p>
-                                <p><strong>Phone:</strong> {tender.company.phone}</p>
-                              </>
-                            ) : (
-                              <>
-                                <p><strong>Company:</strong> Not provided</p>
-                                <p><strong>Phone:</strong> Not available</p>
-                              </>
-                            )}
-
-                            <p><strong>Budget:</strong> ₹{tender.budget}</p>
-                          </div>
-
-                          {tender.description.length > 200 && (
-                            <div className="view-more-container">
-                              <button
-                                className="view-more-btn"
-                                onClick={() => toggleDescription(index)}
-                              >
-                                {expandedDescriptions[index] ? 'View Less ↑' : 'View More →'}
-                              </button>
-                            </div>
-                          )}
+                {(Array.isArray(filteredTenders) ? filteredTenders : []).map(
+                  (tender, index) => (
+                    <Fragment key={tender._id || index}>
+                      <tr
+                        onClick={() => handleRowClick(index)}
+                        ref={(el) => (rowRefs.current[index] = el)}
+                        className="cursor-pointer"
+                      >
+                        <td>{tender.title}</td>
+                        <td className="text-blue">{tender.category}</td>
+                        <td className="text-blue">{tender.location}</td>
+                        <td>
+                          <span className="status-badge">{tender.status}</span>
                         </td>
+                        <td>{formatDate(tender.deadline)}</td>
                       </tr>
-                    )}
-                  </Fragment>
-                ))}
+
+                      {expandedRow === index && (
+                        <tr>
+                          <td colSpan="5">
+                            <div
+                              className={`dropdown-details ${
+                                mode === 'dark' ? 'dark-dropdown' : ''
+                              }`}
+                            >
+                              <p>
+                                <strong>Description:</strong>{' '}
+                                {expandedDescriptions[index]
+                                  ? tender.description
+                                  : `${tender.description?.slice(0, 200)}...`}
+                              </p>
+
+                              {tender.company ? (
+                                <>
+                                  <p>
+                                    <strong>Company:</strong> {tender.company.name}
+                                  </p>
+                                  <p>
+                                    <strong>Phone:</strong> {tender.company.phone}
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p>
+                                    <strong>Company:</strong> Not provided
+                                  </p>
+                                  <p>
+                                    <strong>Phone:</strong> Not available
+                                  </p>
+                                </>
+                              )}
+
+                              <p>
+                                <strong>Budget:</strong> ₹{tender.budget}
+                              </p>
+                            </div>
+
+                            {tender.description?.length > 200 && (
+                              <div className="view-more-container">
+                                <button
+                                  className="view-more-btn"
+                                  onClick={() => toggleDescription(index)}
+                                >
+                                  {expandedDescriptions[index]
+                                    ? 'View Less ↑'
+                                    : 'View More →'}
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  )
+                )}
               </tbody>
             </table>
           </div>
