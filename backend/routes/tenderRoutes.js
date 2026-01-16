@@ -83,4 +83,16 @@ router.get('/newTender', fetchUser, async (req, res) => {
   }
 });
 
+router.get('/allTenders', async (req, res) => {
+  try {
+    const tenders = await Application.find()
+      .sort({ createdAt: -1 });
+
+    res.json(Array.isArray(tenders) ? tenders : []);
+  } catch (err) {
+    console.error('Error fetching all tenders:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
